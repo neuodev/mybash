@@ -17,6 +17,8 @@ pub enum ParseErr {
     VarErr(#[from] VarErr),
     #[error("Echo Error: `{0}`")]
     EchoErr(#[from] EchoErr),
+    #[error("Invlaid experssion: {0}")]
+    InvalidExperssion(String),
 }
 
 impl FromStr for LangParser {
@@ -31,6 +33,8 @@ impl FromStr for LangParser {
                 experssions.push(Expression::Var(line.parse::<Variable>()?))
             } else if Echo::is_echo(line) {
                 experssions.push(Expression::Echo(line.parse::<Echo>()?))
+            } else {
+                return Err(ParseErr::InvalidExperssion(line.into()));
             }
 
             idx += 1;

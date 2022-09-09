@@ -28,6 +28,12 @@ pub struct Condition {
     else_expr: Option<Expression>,
 }
 
+impl Condition {
+    pub fn is_if_statment(s: &str) -> bool {
+        s.trim().starts_with("if ")
+    }
+}
+
 #[derive(Debug, Error, PartialEq, Eq)]
 pub enum ConditionErr {
     #[error("`0` is not a valid if else statment")]
