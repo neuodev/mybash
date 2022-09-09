@@ -9,7 +9,7 @@ pub enum EchoErr {
     NoMatch(String),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Echo(pub String);
 
 impl Echo {

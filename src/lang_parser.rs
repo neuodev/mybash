@@ -40,7 +40,7 @@ impl FromStr for LangParser {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Expression {
     Var(Variable),
     Echo(Echo),

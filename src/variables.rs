@@ -3,7 +3,7 @@ use regex::Regex;
 use std::{fmt::Display, str::FromStr};
 use thiserror::Error;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum VarValue {
     Int(i32),
     Str(String),
@@ -19,7 +19,7 @@ pub enum VarErr {
     InvalidDataType(String),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Variable {
     pub name: String,
     pub value: VarValue,
