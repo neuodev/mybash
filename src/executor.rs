@@ -1,6 +1,5 @@
-use std::collections::HashMap;
-
 use crate::{echo::Echo, lang_parser::Expression, variables::VarValue};
+use std::collections::HashMap;
 
 pub struct Executor;
 

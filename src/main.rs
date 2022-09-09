@@ -1,3 +1,4 @@
+mod conditions;
 mod echo;
 mod executor;
 mod lang_parser;
