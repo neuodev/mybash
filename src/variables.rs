@@ -21,8 +21,8 @@ pub enum VarErr {
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Variable {
-    name: String,
-    value: VarValue,
+    pub name: String,
+    pub value: VarValue,
 }
 
 impl Variable {

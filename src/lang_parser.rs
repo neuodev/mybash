@@ -8,7 +8,7 @@ use crate::{
 
 #[derive(Debug)]
 pub struct LangParser {
-    experssions: Vec<Expression>,
+    pub experssions: Vec<Expression>,
 }
 
 #[derive(Debug, Error)]
@@ -27,8 +27,6 @@ impl FromStr for LangParser {
         let mut experssions = Vec::new();
         while idx < lines.len() {
             let line = lines[idx];
-            println!("[line][{}] {}", idx, line);
-
             if Variable::is_var(line) {
                 experssions.push(Expression::Var(line.parse::<Variable>()?))
             } else if Echo::is_echo(line) {

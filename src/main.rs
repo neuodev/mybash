@@ -1,8 +1,10 @@
 mod echo;
+mod executor;
 mod lang_parser;
 mod regex;
 mod variables;
 
+use executor::Executor;
 use lang_parser::{LangParser, ParseErr};
 use std::{env, fs, path::Path};
 use thiserror::Error;
@@ -31,8 +33,8 @@ fn main() -> Result<(), TopLevelErr> {
     }
 
     let content = fs::read_to_string(path)?;
-
     let result = content.parse::<LangParser>()?;
-    println!("{:?}", result);
+    Executor::execute(result.experssions);
+
     Ok(())
 }
