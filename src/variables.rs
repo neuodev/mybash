@@ -9,7 +9,7 @@ pub enum VarValue {
     Str(String),
 }
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, PartialEq, Eq)]
 pub enum VarErr {
     #[error("`{0}` is not a valid int")]
     InvalidInt(String),

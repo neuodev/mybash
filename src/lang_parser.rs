@@ -11,7 +11,7 @@ pub struct LangParser {
     pub experssions: Vec<Expression>,
 }
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, PartialEq, Eq)]
 pub enum ParseErr {
     #[error("Invalid variable: `{0}`")]
     VarErr(#[from] VarErr),
