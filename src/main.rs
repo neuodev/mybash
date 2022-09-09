@@ -1,3 +1,4 @@
+mod echo;
 mod parser;
 mod regex;
 mod variables;
