@@ -1,13 +1,13 @@
 use std::str::FromStr;
 use thiserror::Error;
-pub struct Parser;
+pub struct LangParser;
 
 #[derive(Debug, Error)]
-pub enum ParserErr {}
+pub enum ParseErr {}
 
-impl FromStr for Parser {
-    type Err = ParserErr;
+impl FromStr for LangParser {
+    type Err = ParseErr;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Parser)
+        Ok(LangParser)
     }
 }
