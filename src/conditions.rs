@@ -22,6 +22,7 @@ use thiserror::Error;
 /// do <expr>
 /// endif
 /// ```
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Condition {
     condition: String,
     if_expr: Expression,
@@ -58,7 +59,7 @@ impl Condition {
         }
 
         let mut curr_idx = start_idx;
-        while curr_idx < num_of_lines {
+        while curr_idx < num_of_lines - 1 {
             curr_idx += 1;
 
             let line = lines[curr_idx];
@@ -73,6 +74,13 @@ impl Condition {
             if Condition::is_endif(line) {
                 break;
             }
+        }
+
+        if lines[curr_idx] != "endif" {
+            return Err(ConditionErr::InvalidExperssion(format!(
+                "Expected `endif` but found {}",
+                lines[curr_idx]
+            )));
         }
 
         let expr_lines = &lines[start_idx..curr_idx + 1];
@@ -226,5 +234,23 @@ mod test {
 
         assert_eq!(expr, lines[1..6].join("\n").to_string());
         assert_eq!(idx, 5)
+    }
+
+    #[test]
+    fn parse_if_without_endif() {
+        let lines = vec![
+            "name: Str: Jone",
+            "if condtion",
+            "do echo 'hello, world'",
+            "else",
+            "do num: Int = 32",
+        ];
+
+        let res = Condition::from_lines(&lines, 1).err().unwrap();
+
+        assert_eq!(
+            res,
+            ConditionErr::InvalidExperssion(format!("Expected `endif` but found {}", lines[4]))
+        );
     }
 }

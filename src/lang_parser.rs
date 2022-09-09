@@ -2,7 +2,7 @@ use std::str::FromStr;
 use thiserror::Error;
 
 use crate::{
-    conditions::Condition,
+    conditions::{Condition, ConditionErr},
     echo::{Echo, EchoErr},
     variables::{VarErr, Variable},
 };
@@ -18,6 +18,8 @@ pub enum ParseErr {
     VarErr(#[from] VarErr),
     #[error("Echo Error: `{0}`")]
     EchoErr(#[from] EchoErr),
+    #[error("Condtion Error: `{0}`")]
+    CondtionErr(#[from] Box<ConditionErr>),
     #[error("Invlaid experssion: {0}")]
     InvalidExperssion(String),
 }
@@ -35,6 +37,10 @@ impl FromStr for LangParser {
             } else if Echo::is_echo(line) {
                 experssions.push(Expression::Echo(line.parse::<Echo>()?))
             } else if Condition::is_if_statment(line) {
+                let (expr, curr_idx) =
+                    Condition::from_lines(&lines, idx).map_err(|e| Box::new(e))?;
+                idx = curr_idx;
+                let cond = expr.parse::<Condition>().map_err(|e| Box::new(e))?;
             } else {
                 return Err(ParseErr::InvalidExperssion(line.into()));
             }
@@ -50,6 +56,7 @@ impl FromStr for LangParser {
 pub enum Expression {
     Var(Variable),
     Echo(Echo),
+    Condition(Box<Condition>),
 }
 
 #[cfg(test)]
