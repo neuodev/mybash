@@ -3,7 +3,7 @@ use regex::Regex;
 use std::str::FromStr;
 use thiserror::Error;
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, PartialEq, Eq)]
 pub enum EchoErr {
     #[error("`{0}` doesn't match echo epxer")]
     NoMatch(String),
@@ -27,6 +27,8 @@ impl FromStr for Echo {
 
 #[cfg(test)]
 mod tests {
+    use crate::echo::EchoErr;
+
     use super::Echo;
 
     #[test]
@@ -45,5 +47,14 @@ mod tests {
         assert_eq!(expr.parse::<Echo>().unwrap(), Echo("$1".into()));
         let expr = "echo               some_var";
         assert_eq!(expr.parse::<Echo>().unwrap(), Echo("some_var".into()));
+    }
+
+    #[test]
+    fn should_get_invalid_echo_expr() {
+        let expr = "invalid echo";
+        assert_eq!(
+            expr.parse::<Echo>().err().unwrap(),
+            EchoErr::NoMatch(expr.into())
+        );
     }
 }
