@@ -2,6 +2,7 @@ use std::str::FromStr;
 use thiserror::Error;
 
 use crate::{
+    conditions::Condition,
     echo::{Echo, EchoErr},
     variables::{VarErr, Variable},
 };
@@ -33,6 +34,7 @@ impl FromStr for LangParser {
                 experssions.push(Expression::Var(line.parse::<Variable>()?))
             } else if Echo::is_echo(line) {
                 experssions.push(Expression::Echo(line.parse::<Echo>()?))
+            } else if Condition::is_if_statment(line) {
             } else {
                 return Err(ParseErr::InvalidExperssion(line.into()));
             }

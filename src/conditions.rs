@@ -32,6 +32,53 @@ impl Condition {
     pub fn is_if_statment(s: &str) -> bool {
         s.trim().starts_with("if ")
     }
+
+    pub fn is_endif(s: &str) -> bool {
+        s.trim() == "endif"
+    }
+
+    pub fn from_lines(
+        lines: &Vec<&str>,
+        start_idx: usize,
+    ) -> Result<(String, usize), ConditionErr> {
+        let num_of_lines = lines.len();
+
+        if start_idx >= num_of_lines {
+            return Err(ConditionErr::InvalidIdx(format!(
+                "Index out of range. idx = {start_idx}. 0 <= idx < {}",
+                num_of_lines
+            )));
+        }
+
+        if !Condition::is_if_statment(lines[start_idx]) {
+            return Err(ConditionErr::InvalidExperssion(format!(
+                "Expr: {} is not a valid if statment",
+                lines[start_idx]
+            )));
+        }
+
+        let mut curr_idx = start_idx;
+        while curr_idx < num_of_lines {
+            curr_idx += 1;
+
+            let line = lines[curr_idx];
+
+            if Condition::is_if_statment(line) {
+                return Err(ConditionErr::InvalidExperssion(format!(
+                    "Found another if statment before ending the first one: {}",
+                    line
+                )));
+            }
+
+            if Condition::is_endif(line) {
+                break;
+            }
+        }
+
+        let expr_lines = &lines[start_idx..curr_idx + 1];
+
+        Ok((expr_lines.join("\n").to_string(), curr_idx))
+    }
 }
 
 #[derive(Debug, Error, PartialEq, Eq)]
@@ -42,6 +89,8 @@ pub enum ConditionErr {
     ParseErr(#[from] ParseErr),
     #[error("Invalid experssion: {0}")]
     InvalidExperssion(String),
+    #[error("Invalid Indexing")]
+    InvalidIdx(String),
 }
 
 impl FromStr for Condition {
@@ -85,7 +134,7 @@ mod test {
     use crate::{
         conditions::ConditionErr,
         echo::Echo,
-        lang_parser::Expression,
+        lang_parser::{Expression, ParseErr},
         variables::{VarValue, Variable},
     };
 
@@ -132,7 +181,50 @@ mod test {
         assert!(res.is_err());
         assert_eq!(
             res.err().unwrap(),
-            ConditionErr::InvalidExperssion("echo'Hello, World'".to_string())
+            ConditionErr::ParseErr(ParseErr::InvalidExperssion(
+                "echo'Hello, World'".to_string()
+            ))
         )
+    }
+
+    #[test]
+    fn parse_if_statments_with_line_and_idx() {
+        let lines = vec!["if condtion", "do echo 'hello, world'", "endif"];
+        let (expr, idx) = Condition::from_lines(&lines, 0).unwrap();
+
+        assert_eq!(expr, lines.join("\n"));
+        assert_eq!(idx, 2)
+    }
+
+    #[test]
+    fn multi_line_parsing_with_if_and_else_expr() {
+        let lines = vec![
+            "if condtion",
+            "do echo 'hello, world'",
+            "else",
+            "do num: Int = 32",
+            "endif",
+        ];
+        let (expr, idx) = Condition::from_lines(&lines, 0).unwrap();
+
+        assert_eq!(expr, lines.join("\n"));
+        assert_eq!(idx, 4)
+    }
+
+    #[test]
+    fn multi_line_parsing_as_part_of_other_expr() {
+        let lines = vec![
+            "name: Str: Jone",
+            "if condtion",
+            "do echo 'hello, world'",
+            "else",
+            "do num: Int = 32",
+            "endif",
+            "echo name",
+        ];
+        let (expr, idx) = Condition::from_lines(&lines, 1).unwrap();
+
+        assert_eq!(expr, lines[1..6].join("\n").to_string());
+        assert_eq!(idx, 5)
     }
 }
