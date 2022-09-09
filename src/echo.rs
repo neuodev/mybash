@@ -10,7 +10,14 @@ pub enum EchoErr {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct Echo(String);
+pub struct Echo(pub String);
+
+impl Echo {
+    pub fn is_echo(s: &str) -> bool {
+        let re = Regex::new(RE_ECHO).unwrap();
+        re.is_match(s)
+    }
+}
 
 impl FromStr for Echo {
     type Err = EchoErr;

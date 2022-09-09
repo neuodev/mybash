@@ -32,6 +32,11 @@ impl Variable {
             value,
         }
     }
+
+    pub fn is_var(s: &str) -> bool {
+        let re = Regex::new(RE_VAR).unwrap();
+        re.is_match(s)
+    }
 }
 
 impl FromStr for Variable {

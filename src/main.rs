@@ -32,7 +32,7 @@ fn main() -> Result<(), TopLevelErr> {
 
     let content = fs::read_to_string(path)?;
 
-    let ctx = content.parse::<LangParser>()?;
-
+    let result = content.parse::<LangParser>()?;
+    println!("{:?}", result);
     Ok(())
 }
