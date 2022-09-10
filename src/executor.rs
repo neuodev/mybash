@@ -65,8 +65,17 @@ impl<'a> Executor<'a> {
         let left_val = self.found_var_or_create(left);
         let right_val = self.found_var_or_create(right);
         let is_true = CompareExpr::cmp(&left_val, &right_val, operator)?;
-        if is_true {
-            match if_expr {
+        let expr = match (is_true, else_expr.is_some()) {
+            (false, false) => None,
+            (false, true) => match else_expr {
+                Some(expr) => Some(expr),
+                None => None,
+            },
+            (true, _) => Some(if_expr),
+        };
+
+        if let Some(expr) = expr {
+            match expr {
                 Expression::Var(var) => {
                     self.vars.insert(&var.name, &var.value);
                 }
