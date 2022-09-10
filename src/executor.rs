@@ -1,9 +1,23 @@
-use crate::{echo::Echo, lang_parser::Expression, variables::VarValue};
+use crate::{conditions::Condition, echo::Echo, lang_parser::Expression, variables::VarValue};
 use std::collections::HashMap;
 
-pub struct Executor;
+pub struct Executor<'a> {
+    vars: HashMap<&'a String, &'a VarValue>,
+    expressions: &'a Vec<Expression>,
+}
 
-impl Executor {
+impl<'a> Executor<'a> {
+    fn new(expressions: &'a Vec<Expression>) -> Self {
+        let mut vars = HashMap::new();
+        expressions.iter().for_each(|e| {
+            if let Expression::Var(var) = e {
+                vars.insert(&var.name, &var.value);
+            }
+        });
+
+        Self { vars, expressions }
+    }
+
     pub fn execute(expressions: Vec<Expression>) {
         // Create variable map
         let mut var_map = HashMap::new();
@@ -26,6 +40,11 @@ impl Executor {
 
                 println!("{}", value);
             } else if let Expression::Condition(con) = expr {
+                let Condition {
+                    if_expr,
+                    else_expr,
+                    condition,
+                } = con.as_ref();
             }
         }
     }

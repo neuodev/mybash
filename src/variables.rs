@@ -9,6 +9,15 @@ pub enum VarValue {
     Str(String),
 }
 
+impl Display for VarValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            VarValue::Int(val) => write!(f, "{}", val),
+            VarValue::Str(val) => write!(f, "{}", val),
+        }
+    }
+}
+
 #[derive(Debug, Error, PartialEq, Eq)]
 pub enum VarErr {
     #[error("`{0}` is not a valid int")]
@@ -36,6 +45,14 @@ impl Variable {
     pub fn is_var(s: &str) -> bool {
         let re = Regex::new(RE_VAR).unwrap();
         re.is_match(s)
+    }
+
+    pub fn is_int(&self) -> bool {
+        if let VarValue::Int(_) = self.value {
+            true
+        } else {
+            false
+        }
     }
 }
 

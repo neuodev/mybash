@@ -1,4 +1,7 @@
-use crate::regex::RE_CMP;
+use crate::{
+    regex::RE_CMP,
+    variables::{VarValue, Variable},
+};
 use regex::Regex;
 use std::str::FromStr;
 use thiserror::Error;
@@ -48,6 +51,47 @@ pub struct CompareExpr {
     pub left: String,
     pub right: String,
     pub operator: Operator,
+}
+
+impl CompareExpr {
+    pub fn cmp(left: &Variable, right: &Variable, op: &Operator) -> Result<bool, CompareExprErr> {
+        let res = match op {
+            Operator::Eq => left.value == right.value,
+            Operator::NotEq => left.value != right.value,
+            other => {
+                let (left_val, right_val) = CompareExpr::is_valid_int_cmp(left, right)?;
+                match other {
+                    Operator::Gt => left_val > right_val,
+                    Operator::GtEq => left_val >= right_val,
+                    Operator::Lt => left_val < right_val,
+                    Operator::LtEq => left_val <= right_val,
+                    _ => unreachable!(),
+                }
+            }
+        };
+
+        Ok(res)
+    }
+
+    fn is_valid_int_cmp(left: &Variable, right: &Variable) -> Result<(i32, i32), CompareExprErr> {
+        match (&left.value, &right.value) {
+            (VarValue::Int(left_val), VarValue::Int(right_val)) => {
+                Ok((left_val.clone(), right_val.clone()))
+            }
+            (VarValue::Int(_), VarValue::Str(v)) => Err(CompareExprErr::InvalidComparson(format!(
+                "`{}` is not a valid right hand side",
+                v
+            ))),
+            (VarValue::Str(v), VarValue::Int(_)) => Err(CompareExprErr::InvalidComparson(format!(
+                "`{}` is not a valid left hand side",
+                v
+            ))),
+            (VarValue::Str(l), VarValue::Str(r)) => Err(CompareExprErr::InvalidComparson(format!(
+                "`{}` & `{}` Invalid right and left hand side",
+                l, r
+            ))),
+        }
+    }
 }
 
 impl FromStr for CompareExpr {
