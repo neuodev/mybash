@@ -107,7 +107,7 @@ impl FromStr for Condition {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let re = Regex::new(RE_IF_ELSE).unwrap();
         if let Some(caps) = re.captures(s.trim()) {
-            let condition = caps["con"].to_string();
+            let condition = caps["con"].trim().to_string();
 
             let raw_if_expr = caps["if_expr"].to_string();
             let if_expr = raw_if_expr.parse::<LangParser>()?.experssions;
