@@ -36,7 +36,8 @@ fn main() -> Result<(), TopLevelErr> {
 
     let content = fs::read_to_string(path)?;
     let result = content.parse::<LangParser>()?;
-    Executor::execute(result.experssions);
+    let exe = Executor::new(&result.experssions);
+    exe.execute();
 
     Ok(())
 }

@@ -7,7 +7,7 @@ pub struct Executor<'a> {
 }
 
 impl<'a> Executor<'a> {
-    fn new(expressions: &'a Vec<Expression>) -> Self {
+    pub fn new(expressions: &'a Vec<Expression>) -> Self {
         let mut vars = HashMap::new();
         expressions.iter().for_each(|e| {
             if let Expression::Var(var) = e {
@@ -18,19 +18,10 @@ impl<'a> Executor<'a> {
         Self { vars, expressions }
     }
 
-    pub fn execute(expressions: Vec<Expression>) {
-        // Create variable map
-        let mut var_map = HashMap::new();
-
-        expressions.iter().for_each(|e| {
-            if let Expression::Var(var) = e {
-                var_map.insert(&var.name, &var.value);
-            }
-        });
-
-        for expr in &expressions {
+    pub fn execute(&self) {
+        for expr in self.expressions {
             if let Expression::Echo(Echo(s)) = expr {
-                let value = match var_map.get(&s) {
+                let value = match self.vars.get(&s) {
                     Some(val) => match val {
                         VarValue::Int(val) => val.to_string(),
                         VarValue::Str(val) => val.to_string(),
