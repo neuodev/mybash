@@ -3,7 +3,7 @@ use regex::Regex;
 use std::str::FromStr;
 use thiserror::Error;
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, PartialEq, Eq)]
 pub enum OperatorErr {
     #[error("`{0}` is not a valid operator")]
     InvalidOperator(String),
@@ -35,7 +35,7 @@ impl FromStr for Operator {
     }
 }
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, PartialEq, Eq)]
 pub enum CompareExprErr {
     #[error("Operator error: {0}")]
     OperatorErr(#[from] OperatorErr),
@@ -69,7 +69,7 @@ impl FromStr for CompareExpr {
 
 #[cfg(test)]
 mod test {
-    use super::{CompareExpr, Operator};
+    use super::{CompareExpr, CompareExprErr, Operator, OperatorErr};
 
     #[test]
     fn new_operator() {
@@ -94,6 +94,17 @@ mod test {
                 right: "20".into(),
                 operator: Operator::Gt
             }
+        )
+    }
+
+    #[test]
+    fn parse_invalid_expr() {
+        let expr = "age !! 20";
+        let cmp = expr.parse::<CompareExpr>();
+
+        assert_eq!(
+            cmp.err().unwrap(),
+            CompareExprErr::OperatorErr(OperatorErr::InvalidOperator("!!".into()))
         )
     }
 }
