@@ -24,9 +24,9 @@ use thiserror::Error;
 /// ```
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Condition {
-    condition: String,
-    if_expr: Expression,
-    else_expr: Option<Expression>,
+    pub condition: String,
+    pub if_expr: Expression,
+    pub else_expr: Option<Expression>,
 }
 
 impl Condition {

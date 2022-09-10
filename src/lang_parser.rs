@@ -64,6 +64,7 @@ pub enum Expression {
 #[cfg(test)]
 mod test {
     use crate::{
+        conditions::Condition,
         echo::Echo,
         lang_parser::Expression,
         variables::{VarValue, Variable},
@@ -91,11 +92,19 @@ mod test {
         let result = expr.parse::<LangParser>().unwrap();
         let LangParser { experssions } = result;
 
-        assert_eq!(experssions.len(), 2);
+        assert_eq!(experssions.len(), 3);
         assert_eq!(
             experssions[0],
-            Expression::Var(Variable::new("name", VarValue::Str("Jone".into())))
+            Expression::Var(Variable::new("age", VarValue::Int(30)))
         );
-        assert_eq!(experssions[1], Expression::Echo(Echo("name".into())));
+        assert_eq!(experssions[1], Expression::Echo(Echo("age".into())));
+        assert_eq!(
+            experssions[2],
+            Expression::Condition(Box::new(Condition {
+                condition: "age > 20".into(),
+                if_expr: Expression::Echo(Echo("I am old".into())),
+                else_expr: Some(Expression::Echo(Echo("I am still young".into())))
+            }))
+        );
     }
 }

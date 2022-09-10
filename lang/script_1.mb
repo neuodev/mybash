@@ -3,4 +3,5 @@ echo age
 if age > 20 
 do echo "I am old"
 else 
-do "I am still young"
+do echo "I am still young"
+endif
