@@ -8,6 +8,7 @@ pub enum OperatorErr {
     #[error("`{0}` is not a valid operator")]
     InvalidOperator(String),
 }
+#[derive(Debug, PartialEq, Eq)]
 pub enum Operator {
     Eq,
     NotEq,
@@ -42,10 +43,11 @@ pub enum CompareExprErr {
     InvalidComparson(String),
 }
 
+#[derive(Debug, PartialEq, Eq)]
 pub struct CompareExpr {
-    left: String,
-    right: String,
-    operator: Operator,
+    pub left: String,
+    pub right: String,
+    pub operator: Operator,
 }
 
 impl FromStr for CompareExpr {
@@ -62,5 +64,36 @@ impl FromStr for CompareExpr {
         } else {
             Err(CompareExprErr::InvalidComparson(s.into()))
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::{CompareExpr, Operator};
+
+    #[test]
+    fn new_operator() {
+        assert_eq!("==".parse::<Operator>().unwrap(), Operator::Eq);
+        assert_eq!("!=".parse::<Operator>().unwrap(), Operator::NotEq);
+        assert_eq!(">".parse::<Operator>().unwrap(), Operator::Gt);
+        assert_eq!(">=".parse::<Operator>().unwrap(), Operator::GtEq);
+        assert_eq!("<".parse::<Operator>().unwrap(), Operator::Lt);
+        assert_eq!("<=".parse::<Operator>().unwrap(), Operator::LtEq);
+        assert!("..".parse::<Operator>().is_err());
+    }
+
+    #[test]
+    fn parse_equality_expr() {
+        let expr = "age > 20";
+        let cmp = expr.parse::<CompareExpr>().unwrap();
+
+        assert_eq!(
+            cmp,
+            CompareExpr {
+                left: "age".into(),
+                right: "20".into(),
+                operator: Operator::Gt
+            }
+        )
     }
 }
