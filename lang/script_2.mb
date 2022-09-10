@@ -1,4 +1,4 @@
-name: Int = "jone"
+name: Str = "Jone Doe"
 echo name
 if name !=  "" 
 do echo name
