@@ -1,3 +1,4 @@
+mod cmp;
 mod conditions;
 mod echo;
 mod executor;
