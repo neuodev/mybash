@@ -6,7 +6,7 @@ mod lang_parser;
 mod regex;
 mod variables;
 
-use executor::Executor;
+use executor::{ExeError, Executor};
 use lang_parser::{LangParser, ParseErr};
 use std::{env, fs, path::Path};
 use thiserror::Error;
@@ -21,6 +21,8 @@ enum TopLevelErr {
     IoError(#[from] std::io::Error),
     #[error("Parse error: {0}")]
     ParseErr(#[from] ParseErr),
+    #[error("Executor error: {0}")]
+    ExeError(#[from] ExeError),
 }
 
 fn main() -> Result<(), TopLevelErr> {
@@ -36,8 +38,8 @@ fn main() -> Result<(), TopLevelErr> {
 
     let content = fs::read_to_string(path)?;
     let result = content.parse::<LangParser>()?;
-    let exe = Executor::new(&result.experssions);
-    exe.execute();
+    let mut exe = Executor::new(&result.experssions);
+    exe.execute()?;
 
     Ok(())
 }

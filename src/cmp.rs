@@ -54,10 +54,10 @@ pub struct CompareExpr {
 }
 
 impl CompareExpr {
-    pub fn cmp(left: &Variable, right: &Variable, op: &Operator) -> Result<bool, CompareExprErr> {
+    pub fn cmp(left: &VarValue, right: &VarValue, op: &Operator) -> Result<bool, CompareExprErr> {
         let res = match op {
-            Operator::Eq => left.value == right.value,
-            Operator::NotEq => left.value != right.value,
+            Operator::Eq => left == right,
+            Operator::NotEq => left != right,
             other => {
                 let (left_val, right_val) = CompareExpr::is_valid_int_cmp(left, right)?;
                 match other {
@@ -73,8 +73,8 @@ impl CompareExpr {
         Ok(res)
     }
 
-    fn is_valid_int_cmp(left: &Variable, right: &Variable) -> Result<(i32, i32), CompareExprErr> {
-        match (&left.value, &right.value) {
+    fn is_valid_int_cmp(left: &VarValue, right: &VarValue) -> Result<(i32, i32), CompareExprErr> {
+        match (&left, &right) {
             (VarValue::Int(left_val), VarValue::Int(right_val)) => {
                 Ok((left_val.clone(), right_val.clone()))
             }

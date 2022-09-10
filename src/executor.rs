@@ -1,11 +1,18 @@
 use crate::{
-    cmp::CompareExpr,
+    cmp::{CompareExpr, CompareExprErr},
     conditions::Condition,
     echo::Echo,
     lang_parser::Expression,
     variables::{VarValue, Variable},
 };
 use std::collections::HashMap;
+use thiserror::Error;
+
+#[derive(Debug, Error)]
+pub enum ExeError {
+    #[error("Compare Expr Error: {0}")]
+    CompareExprErr(#[from] CompareExprErr),
+}
 
 pub struct Executor<'a> {
     vars: HashMap<&'a str, &'a VarValue>,
@@ -24,14 +31,16 @@ impl<'a> Executor<'a> {
         Self { vars, expressions }
     }
 
-    pub fn execute(&self) {
+    pub fn execute(&mut self) -> Result<(), ExeError> {
         for expr in self.expressions {
             if let Expression::Echo(Echo(s)) = expr {
                 self.eval_echo(s);
             } else if let Expression::Condition(con) = expr {
-                self.eval_condition(con.as_ref())
+                self.eval_condition(con.as_ref())?;
             }
         }
+
+        Ok(())
     }
 
     fn eval_echo(&self, s: &str) {
@@ -41,7 +50,7 @@ impl<'a> Executor<'a> {
         };
     }
 
-    fn eval_condition(&self, con: &Condition) {
+    fn eval_condition(&mut self, con: &'a Condition) -> Result<(), ExeError> {
         let Condition {
             if_expr,
             else_expr,
@@ -55,6 +64,20 @@ impl<'a> Executor<'a> {
 
         let left_val = self.found_var_or_create(left);
         let right_val = self.found_var_or_create(right);
+        let is_true = CompareExpr::cmp(&left_val, &right_val, operator)?;
+        if is_true {
+            match if_expr {
+                Expression::Var(var) => {
+                    self.vars.insert(&var.name, &var.value);
+                }
+                Expression::Echo(Echo(s)) => {
+                    self.eval_echo(s);
+                }
+                Expression::Condition(_) => todo!(),
+            };
+        }
+
+        Ok(())
     }
 
     fn found_var_or_create(&self, s: &str) -> VarValue {
