@@ -8,7 +8,7 @@ pub enum OperatorErr {
     #[error("`{0}` is not a valid operator")]
     InvalidOperator(String),
 }
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Operator {
     Eq,
     NotEq,
@@ -43,7 +43,7 @@ pub enum CompareExprErr {
     InvalidComparson(String),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct CompareExpr {
     pub left: String,
     pub right: String,
@@ -57,8 +57,8 @@ impl FromStr for CompareExpr {
 
         if let Some(caps) = re.captures(s) {
             Ok(Self {
-                left: caps["left"].to_string(),
-                right: caps["right"].to_string(),
+                left: caps["left"].trim().to_string(),
+                right: caps["right"].trim().to_string(),
                 operator: caps["op"].parse::<Operator>()?,
             })
         } else {

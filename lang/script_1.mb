@@ -1,6 +1,6 @@
 age: Int = 30
 echo age
-if age > 20 
+if age > 40 
 do echo "I am old"
 else 
 do echo "I am still young"

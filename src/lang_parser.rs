@@ -64,6 +64,7 @@ pub enum Expression {
 #[cfg(test)]
 mod test {
     use crate::{
+        cmp::CompareExpr,
         conditions::Condition,
         echo::Echo,
         lang_parser::Expression,
@@ -101,7 +102,11 @@ mod test {
         assert_eq!(
             experssions[2],
             Expression::Condition(Box::new(Condition {
-                condition: "age > 20".into(),
+                condition: CompareExpr {
+                    left: "age".into(),
+                    right: "40".into(),
+                    operator: crate::cmp::Operator::Gt
+                },
                 if_expr: Expression::Echo(Echo("I am old".into())),
                 else_expr: Some(Expression::Echo(Echo("I am still young".into())))
             }))

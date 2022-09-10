@@ -1,4 +1,5 @@
 use crate::{
+    cmp::{CompareExpr, CompareExprErr},
     lang_parser::{Expression, LangParser, ParseErr},
     regex::RE_IF_ELSE,
 };
@@ -24,7 +25,7 @@ use thiserror::Error;
 /// ```
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Condition {
-    pub condition: String,
+    pub condition: CompareExpr,
     pub if_expr: Expression,
     pub else_expr: Option<Expression>,
 }
@@ -99,6 +100,8 @@ pub enum ConditionErr {
     InvalidExperssion(String),
     #[error("Invalid Indexing")]
     InvalidIdx(String),
+    #[error("Invalid comparison: {0}")]
+    InvalidComparson(#[from] CompareExprErr),
 }
 
 impl FromStr for Condition {
@@ -107,7 +110,7 @@ impl FromStr for Condition {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let re = Regex::new(RE_IF_ELSE).unwrap();
         if let Some(caps) = re.captures(s.trim()) {
-            let condition = caps["con"].trim().to_string();
+            let condition = caps["con"].parse::<CompareExpr>()?;
 
             let raw_if_expr = caps["if_expr"].to_string();
             let if_expr = raw_if_expr.parse::<LangParser>()?.experssions;
@@ -140,6 +143,7 @@ impl FromStr for Condition {
 #[cfg(test)]
 mod test {
     use crate::{
+        cmp::CompareExpr,
         conditions::ConditionErr,
         echo::Echo,
         lang_parser::{Expression, ParseErr},
@@ -150,28 +154,43 @@ mod test {
 
     #[test]
     fn parse_if_statments_only() {
-        let expr = "if condition\ndo echo 'Hello, World'\nendif";
+        let expr = "if cool >= 1000\ndo echo 'Hello, World'\nendif";
         let Condition {
             condition,
             if_expr,
             else_expr,
         } = expr.parse::<Condition>().unwrap();
 
-        assert_eq!(condition, "condition".to_string());
+        assert_eq!(
+            condition,
+            CompareExpr {
+                left: "cool".into(),
+                right: "1000".into(),
+                operator: crate::cmp::Operator::GtEq
+            }
+        );
         assert_eq!(if_expr, Expression::Echo(Echo("Hello, World".to_string())));
         assert!(else_expr.is_none());
     }
 
     #[test]
     fn parse_if_else_statments() {
-        let expr = "if some_condition\ndo name: String = 'Hello, World'\nelse\ndo echo 'Hello, World'\nendif";
+        let expr =
+            "if age != 30\ndo name: String = 'Hello, World'\nelse\ndo echo 'Hello, World'\nendif";
         let Condition {
             condition,
             if_expr,
             else_expr,
         } = expr.parse::<Condition>().unwrap();
 
-        assert_eq!(condition, "some_condition".to_string());
+        assert_eq!(
+            condition,
+            CompareExpr {
+                left: "age".into(),
+                right: "30".into(),
+                operator: crate::cmp::Operator::NotEq
+            }
+        );
         assert_eq!(
             if_expr,
             Expression::Var(Variable::new("name", VarValue::Str("Hello, World".into())))
@@ -184,7 +203,7 @@ mod test {
 
     #[test]
     fn parse_if_statments_with_invalid_expr() {
-        let expr = "if condition\ndo echo'Hello, World'\nendif";
+        let expr = "if age > 30\ndo echo'Hello, World'\nendif";
         let res = expr.parse::<Condition>();
         assert!(res.is_err());
         assert_eq!(
