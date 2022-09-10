@@ -25,6 +25,7 @@ impl Executor {
                 };
 
                 println!("{}", value);
+            } else if let Expression::Condition(con) = expr {
             }
         }
     }

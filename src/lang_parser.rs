@@ -40,7 +40,9 @@ impl FromStr for LangParser {
                 let (expr, curr_idx) =
                     Condition::from_lines(&lines, idx).map_err(|e| Box::new(e))?;
                 idx = curr_idx;
-                let cond = expr.parse::<Condition>().map_err(|e| Box::new(e))?;
+                experssions.push(Expression::Condition(Box::new(
+                    expr.parse::<Condition>().map_err(|e| Box::new(e))?,
+                )));
             } else {
                 return Err(ParseErr::InvalidExperssion(line.into()));
             }
@@ -72,6 +74,20 @@ mod test {
     #[test]
     fn declare_var_and_echo_it() {
         let expr = "name: String = 'Jone'\necho name";
+        let result = expr.parse::<LangParser>().unwrap();
+        let LangParser { experssions } = result;
+
+        assert_eq!(experssions.len(), 2);
+        assert_eq!(
+            experssions[0],
+            Expression::Var(Variable::new("name", VarValue::Str("Jone".into())))
+        );
+        assert_eq!(experssions[1], Expression::Echo(Echo("name".into())));
+    }
+
+    #[test]
+    fn parse_if_statment() {
+        let expr = include_str!("../lang/script_1.mb");
         let result = expr.parse::<LangParser>().unwrap();
         let LangParser { experssions } = result;
 
