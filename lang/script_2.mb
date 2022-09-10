@@ -1,0 +1,7 @@
+name: Int = "jone"
+echo name
+if name !=  "" 
+do echo name
+else 
+do echo "You have no name!"
+endif
