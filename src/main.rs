@@ -4,6 +4,7 @@ mod echo;
 mod executor;
 mod lang_parser;
 mod regex;
+mod utils;
 mod variables;
 
 use executor::{ExeError, Executor};
