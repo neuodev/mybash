@@ -3,8 +3,7 @@
 A very minimalistic programming language built with Rust
 
 <p align="center"> 
-    <img src="./mybash
-.png" alt="My Bash" title="My Bash">
+    <img src="./mybash.png" alt="My Bash" title="My Bash">
 </p>
 
 ## Example
