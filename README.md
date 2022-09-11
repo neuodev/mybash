@@ -3,7 +3,8 @@
 A very minimalistic programming language built with Rust
 
 <p align="center"> 
-    <img src="./mybash.png" alt="My Bash" title="My Bash">
+    <img src="./mybash
+.png" alt="My Bash" title="My Bash">
 </p>
 
 ## Example
@@ -27,4 +28,6 @@ echo math_expr
 
 # Todo
 
-1. Support more types like `boolean`
+1. Make program `args` and `env` variables available using the `$` syntax
+2. Comments
+3. Math expr evaluation
