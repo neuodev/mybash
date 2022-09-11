@@ -31,3 +31,4 @@ echo math_expr
 1. Make program `args` and `env` variables available using the `$` syntax
 2. Comments
 3. Math expr evaluation
+4. Support string concatnation with the echo command

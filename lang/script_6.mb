@@ -1,0 +1,5 @@
+echo $PATH
+echo $PWD
+
+echo $1
+echo $2
