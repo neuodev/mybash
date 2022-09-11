@@ -7,6 +7,7 @@ use thiserror::Error;
 pub enum VarValue {
     Int(i32),
     Str(String),
+    Bool(bool),
 }
 
 impl Display for VarValue {
@@ -14,6 +15,7 @@ impl Display for VarValue {
         match self {
             VarValue::Int(val) => write!(f, "{}", val),
             VarValue::Str(val) => write!(f, "{}", val),
+            VarValue::Bool(val) => write!(f, "{}", val),
         }
     }
 }
@@ -26,6 +28,8 @@ pub enum VarErr {
     InvlaidVarDeclaration(String),
     #[error("`{0}` is not valid datatypes\nDatatype: [Int, Str, String]")]
     InvalidDataType(String),
+    #[error("`{0}` is not valid boolean")]
+    InvalidBool(String),
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -66,12 +70,21 @@ impl FromStr for Variable {
             let name = caps["name"].to_string();
             let value = caps["value"].to_string();
             let data = match &caps["type"] {
-                "Str" | "String" => VarValue::Str(value),
-                "Int" => match value.parse::<i32>() {
+                "str" | "string" => VarValue::Str(value),
+                "int" => match value.parse::<i32>() {
                     Ok(val) => VarValue::Int(val),
                     Err(_) => {
                         return Err(VarErr::InvalidInt(format!(
                             "`{}` is not a valid int",
+                            value
+                        )))
+                    }
+                },
+                "bool" => match value.parse::<bool>() {
+                    Ok(val) => VarValue::Bool(val),
+                    Err(_) => {
+                        return Err(VarErr::InvalidBool(format!(
+                            "`{}` is not a valid boolean",
                             value
                         )))
                     }
