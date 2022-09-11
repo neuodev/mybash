@@ -1,6 +1,7 @@
 mod cmp;
 mod conditions;
 mod echo;
+mod eval;
 mod executor;
 mod lang_parser;
 mod regex;

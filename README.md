@@ -27,6 +27,5 @@ echo math_expr
 
 # Todo
 
-1. Comments
-2. Math expr evaluation
-3. Support string concatnation with the echo command
+1. Math expr evaluation
+2. Support string concatnation with the echo command
