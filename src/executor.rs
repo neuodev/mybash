@@ -5,7 +5,7 @@ use crate::{
     lang_parser::Expression,
     variables::{VarValue, Variable},
 };
-use std::collections::HashMap;
+use std::{collections::HashMap, env};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -17,6 +17,7 @@ pub enum ExeError {
 pub struct Executor<'a> {
     vars: HashMap<&'a str, &'a VarValue>,
     expressions: &'a Vec<Expression>,
+    args: Vec<String>,
 }
 
 impl<'a> Executor<'a> {
@@ -27,8 +28,12 @@ impl<'a> Executor<'a> {
                 vars.insert(var.name.as_str(), &var.value);
             }
         });
-
-        Self { vars, expressions }
+        let args = env::args().collect::<Vec<_>>();
+        Self {
+            vars,
+            expressions,
+            args,
+        }
     }
 
     pub fn execute(&mut self) -> Result<(), ExeError> {
@@ -90,8 +95,8 @@ impl<'a> Executor<'a> {
     }
 
     fn found_var_or_create(&self, s: &str) -> VarValue {
-        if let Some(v) = self.vars.get(s) {
-            return (*v).clone();
+        if let Some(v) = self.get_var_value(s) {
+            return v;
         }
 
         let var = match s.parse::<i32>() {
@@ -103,5 +108,26 @@ impl<'a> Executor<'a> {
         };
 
         var
+    }
+
+    fn get_var_value(&self, s: &'a str) -> Option<VarValue> {
+        match self.vars.get(s) {
+            Some(var) => Some((*var).clone()),
+            None => {
+                if !s.starts_with("$") {
+                    return None;
+                }
+                let mut chars = s.chars();
+                chars.next();
+                let var = chars.as_str();
+
+                let value = match var.parse::<usize>() {
+                    Ok(idx) => VarValue::Str(self.args.get(idx).unwrap_or(&"".to_string()).clone()),
+                    Err(_) => VarValue::Str(env::var(var).unwrap_or_default()),
+                };
+
+                Some(value)
+            }
+        }
     }
 }
