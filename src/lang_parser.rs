@@ -27,7 +27,11 @@ pub enum ParseErr {
 impl FromStr for LangParser {
     type Err = ParseErr;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let lines = s.trim().lines().collect::<Vec<_>>();
+        let lines = s
+            .trim()
+            .lines()
+            .filter(|l| !l.is_empty())
+            .collect::<Vec<_>>();
         let mut idx = 0;
         let mut experssions = Vec::new();
         while idx < lines.len() {

@@ -67,8 +67,8 @@ impl FromStr for Variable {
         let re = Regex::new(RE_VAR).unwrap();
 
         if let Some(caps) = re.captures(s) {
-            let name = caps["name"].to_string();
-            let value = caps["value"].to_string();
+            let name = caps["name"].trim().to_string();
+            let value = caps["value"].trim().to_string();
             let data = match &caps["type"] {
                 "str" | "string" => VarValue::Str(value),
                 "int" => match value.parse::<i32>() {

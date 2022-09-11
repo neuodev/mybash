@@ -1,0 +1,7 @@
+is_married: bool = false
+
+if is_married == false
+do echo "You are not married"
+else 
+do echo "You are married"
+endif

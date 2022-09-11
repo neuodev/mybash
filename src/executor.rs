@@ -96,7 +96,10 @@ impl<'a> Executor<'a> {
 
         let var = match s.parse::<i32>() {
             Ok(num) => VarValue::Int(num),
-            Err(_) => VarValue::Str(s.to_string()),
+            Err(_) => match s.parse::<bool>() {
+                Ok(b) => VarValue::Bool(b),
+                Err(_) => VarValue::Str(s.to_string()),
+            },
         };
 
         var
