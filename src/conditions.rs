@@ -176,7 +176,7 @@ mod test {
     #[test]
     fn parse_if_else_statments() {
         let expr =
-            "if age != 30\ndo name: String = 'Hello, World'\nelse\ndo echo 'Hello, World'\nendif";
+            "if age != 30\ndo name: string = 'Hello, World'\nelse\ndo echo 'Hello, World'\nendif";
         let Condition {
             condition,
             if_expr,
@@ -229,7 +229,7 @@ mod test {
             "if condtion",
             "do echo 'hello, world'",
             "else",
-            "do num: Int = 32",
+            "do num: int = 32",
             "endif",
         ];
         let (expr, idx) = Condition::from_lines(&lines, 0).unwrap();
@@ -241,11 +241,11 @@ mod test {
     #[test]
     fn multi_line_parsing_as_part_of_other_expr() {
         let lines = vec![
-            "name: Str: Jone",
+            "name: str: Jone",
             "if condtion",
             "do echo 'hello, world'",
             "else",
-            "do num: Int = 32",
+            "do num: int = 32",
             "endif",
             "echo name",
         ];
@@ -258,11 +258,11 @@ mod test {
     #[test]
     fn parse_if_without_endif() {
         let lines = vec![
-            "name: Str: Jone",
+            "name: str: Jone",
             "if condtion",
             "do echo 'hello, world'",
             "else",
-            "do num: Int = 32",
+            "do num: int = 32",
         ];
 
         let res = Condition::from_lines(&lines, 1).err().unwrap();

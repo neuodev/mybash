@@ -86,9 +86,9 @@ impl CompareExpr {
                 "`{}` is not a valid left hand side",
                 v
             ))),
-            (VarValue::Str(l), VarValue::Str(r)) => Err(CompareExprErr::InvalidComparson(format!(
+            (_, _) => Err(CompareExprErr::InvalidComparson(format!(
                 "`{}` & `{}` Invalid right and left hand side",
-                l, r
+                left, right
             ))),
         }
     }

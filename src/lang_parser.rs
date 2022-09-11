@@ -75,7 +75,7 @@ mod test {
 
     #[test]
     fn declare_var_and_echo_it() {
-        let expr = "name: String = 'Jone'\necho name";
+        let expr = "name: string = 'Jone'\necho name";
         let result = expr.parse::<LangParser>().unwrap();
         let LangParser { experssions } = result;
 

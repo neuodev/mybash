@@ -1,4 +1,4 @@
-age: Int = 30
+age: int = 30
 echo age
 if age > 40 
 do echo "I am old"

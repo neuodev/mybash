@@ -125,7 +125,7 @@ mod test {
 
     #[test]
     fn new_str_var_with_double_quotes() {
-        let expr = "name: Str = \"Jone\"";
+        let expr = "name: str = \"Jone\"";
         let var = expr.parse::<Variable>().unwrap();
 
         assert_eq!(
@@ -139,7 +139,7 @@ mod test {
 
     #[test]
     fn new_str_var_with_single_quotes() {
-        let expr = "email: Str = 'something@whatmatter.com'";
+        let expr = "email: str = 'something@whatmatter.com'";
         let var = expr.parse::<Variable>().unwrap();
 
         assert_eq!(
@@ -153,7 +153,7 @@ mod test {
 
     #[test]
     fn new_int_var() {
-        let expr = "age: Int = 31";
+        let expr = "age: int = 31";
         let var = expr.parse::<Variable>().unwrap();
 
         assert_eq!(
@@ -161,6 +161,20 @@ mod test {
             Variable {
                 name: "age".into(),
                 value: VarValue::Int(31)
+            }
+        )
+    }
+
+    #[test]
+    fn new_bool_var() {
+        let expr = "is_married: bool = false";
+        let var = expr.parse::<Variable>().unwrap();
+
+        assert_eq!(
+            var,
+            Variable {
+                name: "is_married".into(),
+                value: VarValue::Bool(false)
             }
         )
     }
