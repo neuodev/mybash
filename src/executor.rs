@@ -49,7 +49,7 @@ impl<'a> Executor<'a> {
     }
 
     fn eval_echo(&self, s: &str) {
-        match self.vars.get(&s) {
+        match self.get_var_value(s) {
             Some(val) => println!("{}", val),
             None => println!("{}", s),
         };
@@ -122,7 +122,9 @@ impl<'a> Executor<'a> {
                 let var = chars.as_str();
 
                 let value = match var.parse::<usize>() {
-                    Ok(idx) => VarValue::Str(self.args.get(idx).unwrap_or(&"".to_string()).clone()),
+                    Ok(idx) => {
+                        VarValue::Str(self.args.get(idx + 1).unwrap_or(&"".to_string()).clone())
+                    }
                     Err(_) => VarValue::Str(env::var(var).unwrap_or_default()),
                 };
 
