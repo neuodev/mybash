@@ -1,4 +1,4 @@
-use crate::regex::*;
+use crate::{eval::eval, regex::*};
 use regex::Regex;
 use std::{fmt::Display, str::FromStr};
 use thiserror::Error;
@@ -71,11 +71,11 @@ impl FromStr for Variable {
             let value = caps["value"].trim().to_string();
             let data = match &caps["type"] {
                 "str" | "string" => VarValue::Str(value),
-                "int" => match value.parse::<i32>() {
-                    Ok(val) => VarValue::Int(val),
+                "int" => match eval(&value) {
+                    Ok(val) => VarValue::Int(val as i32),
                     Err(_) => {
                         return Err(VarErr::InvalidInt(format!(
-                            "`{}` is not a valid int",
+                            "`{}` is not a valid int expression",
                             value
                         )))
                     }
