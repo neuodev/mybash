@@ -1,5 +1,7 @@
 use regex::Regex;
 
+use crate::regex::RE_INVALID_MATH_EXPR;
+
 enum Op {
     Plus,  // '+'
     Mins,  // '-'
@@ -11,13 +13,19 @@ fn split<'a>(expr: &'a str, by: &'a str) -> Vec<&'a str> {
     expr.split(by).map(|term| term.trim()).collect()
 }
 
-pub fn eval(expr: &str) -> f64 {
+pub fn eval(expr: &str) -> Result<f64, String> {
+    let re_validate = Regex::new(RE_INVALID_MATH_EXPR).unwrap();
+
+    if re_validate.is_match(expr) {
+        return Err(format!("`{}` is not a valid math expression", expr));
+    }
+
     let re = Regex::new(r"(\(|\[)(?P<expr>[^\)\(\]\[]+)(\)|\])").unwrap();
     let mut temp_expr = expr.to_string();
-    re.captures_iter(expr).for_each(|cap| {
+    for cap in re.captures_iter(expr) {
         let res = eval(&cap["expr"]);
-        temp_expr = temp_expr.to_string().replace(&cap[0], &res.to_string());
-    });
+        temp_expr = temp_expr.to_string().replace(&cap[0], &res?.to_string());
+    }
 
     let expr = temp_expr.as_str();
     let mut terms = split(expr, "+");
@@ -44,15 +52,15 @@ pub fn eval(expr: &str) -> f64 {
     }
 
     let mut result: f64 = 0.0;
-    terms.into_iter().enumerate().for_each(|(idx, term)| {
+    for (idx, term) in terms.into_iter().enumerate() {
         let term = match term.parse() {
             Ok(num) => num,
-            Err(_) => eval(term),
+            Err(_) => eval(term)?,
         };
 
         if idx == 0 {
             result = term;
-            return;
+            continue;
         }
 
         match op {
@@ -61,9 +69,9 @@ pub fn eval(expr: &str) -> f64 {
             Op::Multi => result *= term,
             Op::Div => result /= term,
         }
-    });
+    }
 
-    result
+    Ok(result)
 }
 
 #[cfg(test)]
@@ -72,13 +80,19 @@ mod test {
 
     #[test]
     fn eval_simple_math_expr() {
-        let res = eval("12 + 8 / 4 - 3");
+        let res = eval("12 + 8 / 4 - 3").unwrap();
         assert_eq!(res, 12.0 + 8.0 / 4.0 - 3.0);
     }
 
     #[test]
     fn eval_nested_math_expr() {
-        let res = eval("(12 / 2) * [30 * 3]");
+        let res = eval("(12 / 2) * [30 * 3]").unwrap();
         assert_eq!(res, (12.0 / 2.0 * (30.0 * 3.0)))
+    }
+
+    #[test]
+    fn eval_invalid_math_expr() {
+        let res = eval("expr");
+        assert!(res.is_err())
     }
 }

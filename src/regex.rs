@@ -10,3 +10,5 @@ pub const RE_CMP: &str =
     r#"(?m)('|")?(?P<left>[^\s'"\n]+)('|")?\s+(?P<op>[^\s]+)\s+('|")?(?P<right>[^'"\n]+)('|")?"#;
 /// A regular expression to match commments `#`. [Interactive example](https://regex101.com/r/mAhoLQ/1)
 pub const RE_COMMENT: &str = r#"(?m)(^|[^\\])#(.*)"#;
+/// A regular expression to spot invalid math experssions. [Interactive example](https://regex101.com/r/kuMDUi/1)
+pub const RE_INVALID_MATH_EXPR: &str = r#"(?m)[a-zA-Z=]+"#;
