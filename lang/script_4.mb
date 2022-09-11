@@ -1,0 +1,8 @@
+jone_age: int = 20
+jane_age: int = 30
+
+if jone_age > jane_age
+do echo "Jone is older than Jane!"
+else
+do echo "Jane is older than Jone"
+endif
