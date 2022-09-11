@@ -9,4 +9,4 @@ pub const RE_IF_ELSE: &str = r#"(?m)if\s+(?P<con>[^\n]+)\ndo\s+(?P<if_expr>[^\n]
 pub const RE_CMP: &str =
     r#"(?m)('|")?(?P<left>[^\s'"\n]+)('|")?\s+(?P<op>[^\s]+)\s+('|")?(?P<right>[^'"\n]+)('|")?"#;
 /// A regular expression to match commments `#`. [Interactive example](https://regex101.com/r/mAhoLQ/1)
-pub const RE_COMMENT: &str = r#"(?m)(^|[^\\])#(.+)"#;
+pub const RE_COMMENT: &str = r#"(?m)(^|[^\\])#(.*)"#;

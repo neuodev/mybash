@@ -1,5 +1,8 @@
+# Echo env variables to the stdout
+# example: mybash ./sript_6.mb foo bar baz
 echo $PATH
-echo $PWD
+echo $PWD # Current working directory
 
-echo $1
-echo $2
+echo $0  # Should display the script name  (script_6.mb)
+echo $1  # Should display the first arg (foo)
+echo $2  # Should display the second arg (bar)
