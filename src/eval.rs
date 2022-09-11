@@ -95,4 +95,10 @@ mod test {
         let res = eval("expr");
         assert!(res.is_err())
     }
+
+    #[test]
+    fn eval_singl_number() {
+        let res = eval("12");
+        assert_eq!(res.unwrap(), 12.0)
+    }
 }
