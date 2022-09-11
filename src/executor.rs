@@ -69,6 +69,7 @@ impl<'a> Executor<'a> {
 
         let left_val = self.found_var_or_create(left);
         let right_val = self.found_var_or_create(right);
+        println!("left val = {}, right val = {}", left_val, right_val);
         let is_true = CompareExpr::cmp(&left_val, &right_val, operator)?;
         let expr = match (is_true, else_expr.is_some()) {
             (false, false) => None,
