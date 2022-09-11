@@ -4,6 +4,7 @@ use thiserror::Error;
 use crate::{
     conditions::{Condition, ConditionErr},
     echo::{Echo, EchoErr},
+    utils::remove_comments,
     variables::{VarErr, Variable},
 };
 
@@ -30,12 +31,13 @@ impl FromStr for LangParser {
         let lines = s
             .trim()
             .lines()
+            .map(|l| remove_comments(l))
             .filter(|l| !l.is_empty())
             .collect::<Vec<_>>();
         let mut idx = 0;
         let mut experssions = Vec::new();
         while idx < lines.len() {
-            let line = lines[idx];
+            let line = &lines[idx];
             if Variable::is_var(line) {
                 experssions.push(Expression::Var(line.parse::<Variable>()?))
             } else if Echo::is_echo(line) {

@@ -40,7 +40,7 @@ impl Condition {
     }
 
     pub fn from_lines(
-        lines: &Vec<&str>,
+        lines: &Vec<String>,
         start_idx: usize,
     ) -> Result<(String, usize), ConditionErr> {
         let num_of_lines = lines.len();
@@ -52,7 +52,7 @@ impl Condition {
             )));
         }
 
-        if !Condition::is_if_statment(lines[start_idx]) {
+        if !Condition::is_if_statment(&lines[start_idx]) {
             return Err(ConditionErr::InvalidExperssion(format!(
                 "Expr: {} is not a valid if statment",
                 lines[start_idx]
@@ -63,7 +63,7 @@ impl Condition {
         while curr_idx < num_of_lines - 1 {
             curr_idx += 1;
 
-            let line = lines[curr_idx];
+            let line = &lines[curr_idx];
 
             if Condition::is_if_statment(line) {
                 return Err(ConditionErr::InvalidExperssion(format!(
@@ -72,7 +72,7 @@ impl Condition {
                 )));
             }
 
-            if Condition::is_endif(line) {
+            if Condition::is_endif(&line) {
                 break;
             }
         }
@@ -216,7 +216,10 @@ mod test {
 
     #[test]
     fn parse_if_statments_with_line_and_idx() {
-        let lines = vec!["if condtion", "do echo 'hello, world'", "endif"];
+        let lines = vec!["if condtion", "do echo 'hello, world'", "endif"]
+            .into_iter()
+            .map(|expr| expr.to_string())
+            .collect::<Vec<String>>();
         let (expr, idx) = Condition::from_lines(&lines, 0).unwrap();
 
         assert_eq!(expr, lines.join("\n"));
@@ -231,7 +234,11 @@ mod test {
             "else",
             "do num: int = 32",
             "endif",
-        ];
+        ]
+        .into_iter()
+        .map(|expr| expr.to_string())
+        .collect::<Vec<String>>();
+
         let (expr, idx) = Condition::from_lines(&lines, 0).unwrap();
 
         assert_eq!(expr, lines.join("\n"));
@@ -248,7 +255,10 @@ mod test {
             "do num: int = 32",
             "endif",
             "echo name",
-        ];
+        ]
+        .into_iter()
+        .map(|expr| expr.to_string())
+        .collect::<Vec<String>>();
         let (expr, idx) = Condition::from_lines(&lines, 1).unwrap();
 
         assert_eq!(expr, lines[1..6].join("\n").to_string());
@@ -263,7 +273,10 @@ mod test {
             "do echo 'hello, world'",
             "else",
             "do num: int = 32",
-        ];
+        ]
+        .into_iter()
+        .map(|expr| expr.to_string())
+        .collect::<Vec<String>>();
 
         let res = Condition::from_lines(&lines, 1).err().unwrap();
 
