@@ -70,8 +70,9 @@ impl<'a> Executor<'a> {
             replaced_str = replaced_str.replace(&caps[0], &var_value.to_string());
         });
 
+        let default_value = replaced_str.parse::<VarValue>().unwrap();
         self.get_var_value(&replaced_str, false)
-            .unwrap_or(VarValue::Str(replaced_str))
+            .unwrap_or(default_value)
     }
 
     fn eval_condition(&mut self, con: &'a Condition) -> Result<(), ExeError> {
@@ -114,18 +115,17 @@ impl<'a> Executor<'a> {
     }
 
     fn found_var_or_create(&self, s: &str) -> VarValue {
-        if let Some(v) = self.get_var_value(s, false) {
+        if let Some(v) = self.get_var_value(s.trim(), false) {
             return v;
         }
 
-        let var = match s.parse::<i32>() {
+        let var = match s.trim().parse::<i32>() {
             Ok(num) => VarValue::Int(num),
             Err(_) => match s.parse::<bool>() {
                 Ok(b) => VarValue::Bool(b),
                 Err(_) => VarValue::Str(s.to_string()),
             },
         };
-
         var
     }
 

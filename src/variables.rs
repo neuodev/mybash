@@ -3,11 +3,33 @@ use regex::Regex;
 use std::{fmt::Display, str::FromStr};
 use thiserror::Error;
 
+#[derive(Debug, Error)]
+pub enum VarValueErr {
+    #[error("`{0}` is not a valid variable value")]
+    InvalidVarValue(String),
+}
+
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum VarValue {
     Int(i32),
     Str(String),
     Bool(bool),
+}
+
+impl FromStr for VarValue {
+    type Err = VarValueErr;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let res = match s.parse::<i32>() {
+            Ok(num) => Self::Int(num),
+            Err(_) => match s.parse::<bool>() {
+                Ok(res) => Self::Bool(res),
+                Err(_) => Self::Str(s.to_string()),
+            },
+        };
+
+        Ok(res)
+    }
 }
 
 impl Display for VarValue {
