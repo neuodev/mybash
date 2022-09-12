@@ -27,4 +27,4 @@ echo math_expr
 
 # Todo
 
-1. Support string concatnation with the echo command
+1. Support var exapnsion in var declaration
