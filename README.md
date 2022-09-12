@@ -135,7 +135,7 @@ l_name: str = "doe"
 
 full_name: str = "${f_name} ${l_name}"
 
-echo full_name
+echo "My full name is $full_name"
 ```
 
 #### Output
