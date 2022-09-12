@@ -60,12 +60,14 @@ impl<'a> Executor<'a> {
         let mut replaced_str = s.to_string();
         re.captures_iter(s).for_each(|caps| {
             let var = &caps["var"];
-            let var_value = self.get_var_value(var).unwrap_or(VarValue::Str("".into()));
+            let var_value = self
+                .get_var_value(var, true)
+                .unwrap_or(VarValue::Str("".into()));
 
             replaced_str = replaced_str.replace(&caps[0], &var_value.to_string());
         });
 
-        self.get_var_value(&replaced_str)
+        self.get_var_value(&replaced_str, false)
             .unwrap_or(VarValue::Str(replaced_str))
     }
 
@@ -109,7 +111,7 @@ impl<'a> Executor<'a> {
     }
 
     fn found_var_or_create(&self, s: &str) -> VarValue {
-        if let Some(v) = self.get_var_value(s) {
+        if let Some(v) = self.get_var_value(s, false) {
             return v;
         }
 
@@ -124,16 +126,20 @@ impl<'a> Executor<'a> {
         var
     }
 
-    fn get_var_value(&self, s: &'a str) -> Option<VarValue> {
+    fn get_var_value(&self, s: &'a str, is_expansion: bool) -> Option<VarValue> {
         match self.vars.get(s) {
             Some(var) => Some((*var).clone()),
             None => {
-                if !s.starts_with("$") {
+                if !s.starts_with("$") && is_expansion == false {
                     return None;
                 }
                 let mut chars = s.chars();
                 chars.next();
-                let var = chars.as_str();
+                let mut var = chars.as_str();
+
+                if is_expansion == true {
+                    var = s;
+                }
 
                 let value = match var.parse::<usize>() {
                     Ok(idx) => {

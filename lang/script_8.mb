@@ -1,0 +1,9 @@
+name: str = "Jone"
+
+echo "Hello, $name 🙌"
+
+echo "PATH = ${PATH}"
+echo "HOME = $HOME"
+echo "PWD = $PWD"
+echo "HOSTNAME = $HOSTNAME"
+echo "HOSTTYPE = $HOSTTYPE"
