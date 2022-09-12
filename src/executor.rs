@@ -155,12 +155,23 @@ mod test {
     use super::Executor;
 
     #[test]
-    fn eval_var_expansion() {
+    fn eval_var_expansion_with_curly_braces_syntax() {
         let expr = "name: str=Jone\necho \"Hello, ${name}\"";
         let parse_result = expr.parse::<LangParser>().unwrap();
         let exe = Executor::new(&parse_result.experssions);
 
         let value = exe.eval_var_expansion("Hello, ${name}");
+
+        assert_eq!(value, VarValue::Str("Hello, Jone".into()));
+    }
+
+    #[test]
+    fn eval_var_expansion_without_curly_braces() {
+        let expr = "name: str=Jone\necho \"Hello, $name\"";
+        let parse_result = expr.parse::<LangParser>().unwrap();
+        let exe = Executor::new(&parse_result.experssions);
+
+        let value = exe.eval_var_expansion("Hello, $name");
 
         assert_eq!(value, VarValue::Str("Hello, Jone".into()));
     }
