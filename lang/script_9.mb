@@ -1,0 +1,6 @@
+f_name: str = "Jone"
+l_name: str = "doe"
+
+full_name: str = "${f_name} ${l_name}"
+
+echo full_name

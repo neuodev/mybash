@@ -17,7 +17,7 @@ pub enum ExeError {
 }
 
 pub struct Executor<'a> {
-    vars: HashMap<&'a str, &'a VarValue>,
+    vars: HashMap<&'a str, VarValue>,
     expressions: &'a Vec<Expression>,
     args: Vec<String>,
 }
@@ -27,7 +27,7 @@ impl<'a> Executor<'a> {
         let mut vars = HashMap::new();
         expressions.iter().for_each(|e| {
             if let Expression::Var(var) = e {
-                vars.insert(var.name.as_str(), &var.value);
+                vars.insert(var.name.as_str(), var.value.clone());
             }
         });
         let args = env::args().collect::<Vec<_>>();
@@ -44,6 +44,9 @@ impl<'a> Executor<'a> {
                 self.eval_echo(s);
             } else if let Expression::Condition(con) = expr {
                 self.eval_condition(con.as_ref())?;
+            } else if let Expression::Var(Variable { name, value }) = expr {
+                let result = self.eval_var_expansion(&value.to_string());
+                self.vars.insert(&name, result);
             }
         }
 
@@ -98,7 +101,7 @@ impl<'a> Executor<'a> {
         if let Some(expr) = expr {
             match expr {
                 Expression::Var(var) => {
-                    self.vars.insert(&var.name, &var.value);
+                    self.vars.insert(&var.name, var.value.clone());
                 }
                 Expression::Echo(Echo(s)) => {
                     self.eval_echo(s);
