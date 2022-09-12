@@ -12,3 +12,5 @@ pub const RE_CMP: &str =
 pub const RE_COMMENT: &str = r#"(?m)(^|[^\\])#(.*)"#;
 /// A regular expression to spot invalid math experssions. [Interactive example](https://regex101.com/r/kuMDUi/1)
 pub const RE_INVALID_MATH_EXPR: &str = r#"(?m)[a-zA-Z=]+"#;
+/// A regular expression to match variable expansions `ex: echo "Hello, ${name}"`. [Interactive example](https://regex101.com/r/5BLcW2/1)
+pub const RE_VAR_EXPANSION: &str = r#"(?m)\$\{?(?P<var>[^\s"';,}]+)\}?"#;

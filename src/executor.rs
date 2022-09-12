@@ -3,8 +3,10 @@ use crate::{
     conditions::Condition,
     echo::Echo,
     lang_parser::Expression,
+    regex::RE_VAR_EXPANSION,
     variables::{VarValue, Variable},
 };
+use regex::Regex;
 use std::{collections::HashMap, env};
 use thiserror::Error;
 
@@ -49,10 +51,22 @@ impl<'a> Executor<'a> {
     }
 
     fn eval_echo(&self, s: &str) {
-        match self.get_var_value(s) {
-            Some(val) => println!("{}", val),
-            None => println!("{}", s),
-        };
+        let res = self.eval_var_expansion(s);
+        println!("{}", res);
+    }
+
+    fn eval_var_expansion(&self, s: &str) -> VarValue {
+        let re = Regex::new(RE_VAR_EXPANSION).unwrap();
+        let mut replaced_str = s.to_string();
+        re.captures_iter(s).for_each(|caps| {
+            let var = &caps["var"];
+            let var_value = self.get_var_value(var).unwrap_or(VarValue::Str("".into()));
+
+            replaced_str = replaced_str.replace(&caps[0], &var_value.to_string());
+        });
+
+        self.get_var_value(&replaced_str)
+            .unwrap_or(VarValue::Str(replaced_str))
     }
 
     fn eval_condition(&mut self, con: &'a Condition) -> Result<(), ExeError> {
@@ -131,5 +145,23 @@ impl<'a> Executor<'a> {
                 Some(value)
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::{lang_parser::LangParser, variables::VarValue};
+
+    use super::Executor;
+
+    #[test]
+    fn eval_var_expansion() {
+        let expr = "name: str=Jone\necho \"Hello, ${name}\"";
+        let parse_result = expr.parse::<LangParser>().unwrap();
+        let exe = Executor::new(&parse_result.experssions);
+
+        let value = exe.eval_var_expansion("Hello, ${name}");
+
+        assert_eq!(value, VarValue::Str("Hello, Jone".into()));
     }
 }
