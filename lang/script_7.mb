@@ -1,2 +1,3 @@
 res: int = (12 + 12) / 4
+echo "(12 + 12) / 4 ⏬"
 echo res

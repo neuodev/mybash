@@ -3,5 +3,5 @@ echo $1
 if $1 == 'me'
 do echo "Hello, Ahmed"
 else
-do echo "Hi, :) ✋"
+do echo "Hi, :) ${1} ✋"
 endif
