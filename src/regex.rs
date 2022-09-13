@@ -14,3 +14,5 @@ pub const RE_COMMENT: &str = r#"(?m)(^|[^\\])#(.*)"#;
 pub const RE_INVALID_MATH_EXPR: &str = r#"(?m)[a-zA-Z=]+"#;
 /// A regular expression to match variable expansions `ex: echo "Hello, ${name}"`. [Interactive example](https://regex101.com/r/5BLcW2/1)
 pub const RE_VAR_EXPANSION: &str = r#"(?m)\$\{?(?P<var>[^\s"';,}]+)\}?"#;
+/// A regular expression to match match the `input("<text>")` function. [Interactive example](https://regex101.com/r/LPHoMk/1)
+pub const RE_INPUT_FUNC: &str = r#"(?m)input\(('|")?(?P<text>[^)'"]+)('|")?\)"#;
