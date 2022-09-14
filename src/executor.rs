@@ -45,6 +45,7 @@ impl<'a> Executor<'a> {
             } else if let Expression::Condition(con) = expr {
                 self.eval_condition(con.as_ref())?;
             } else if let Expression::Var(Variable { name, value }) = expr {
+                // todo: the `read` function evaluation should go here
                 let result = self.eval_var_expansion(&value.to_string());
                 self.vars.insert(&name, result);
             }
