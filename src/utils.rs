@@ -1,6 +1,6 @@
 use regex::Regex;
 
-use crate::regex::RE_COMMENT;
+use crate::regex::{RE_COMMENT, RE_INPUT_FUNC};
 
 pub fn remove_comments<'a>(s: &'a str) -> String {
     let re = Regex::new(RE_COMMENT).unwrap();
@@ -13,6 +13,11 @@ pub fn remove_comments<'a>(s: &'a str) -> String {
     } else {
         s.trim().replace("\\#", "#").to_string()
     }
+}
+
+pub fn is_input_fn(s: &str) -> bool {
+    let re = Regex::new(RE_INPUT_FUNC).unwrap();
+    re.is_match(s.trim())
 }
 
 #[cfg(test)]

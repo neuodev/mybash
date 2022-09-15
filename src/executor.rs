@@ -4,6 +4,7 @@ use crate::{
     echo::Echo,
     lang_parser::Expression,
     regex::RE_VAR_EXPANSION,
+    utils::is_input_fn,
     variables::{VarValue, Variable},
 };
 use regex::Regex;
@@ -46,8 +47,16 @@ impl<'a> Executor<'a> {
                 self.eval_condition(con.as_ref())?;
             } else if let Expression::Var(Variable { name, value }) = expr {
                 // todo: the `read` function evaluation should go here
-                let result = self.eval_var_expansion(&value.to_string());
-                self.vars.insert(&name, result);
+                println!("{} = {}", name, value);
+                if is_input_fn(&value.to_string()) {
+                    self.vars.insert(
+                        &name,
+                        "This was an input function".parse::<VarValue>().unwrap(),
+                    );
+                } else {
+                    let result = self.eval_var_expansion(&value.to_string());
+                    self.vars.insert(&name, result);
+                }
             }
         }
 

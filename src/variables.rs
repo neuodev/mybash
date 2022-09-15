@@ -1,4 +1,4 @@
-use crate::{eval::eval, regex::*};
+use crate::{eval::eval, regex::*, utils::is_input_fn};
 use regex::Regex;
 use std::{fmt::Display, str::FromStr};
 use thiserror::Error;
@@ -90,7 +90,14 @@ impl FromStr for Variable {
 
         if let Some(caps) = re.captures(s) {
             let name = caps["name"].trim().to_string();
-            let value = caps["value"].trim().to_string();
+            let mut value = caps["value"].trim().to_string();
+            if !is_input_fn(&value.trim()) {
+                println!("[{}] {} ", name, value);
+                let re = Regex::new(RE_QUOTE_REMOVAL).unwrap();
+                if let Some(caps) = re.captures(&value) {
+                    value = caps["value"].to_string()
+                }
+            }
             let data = match &caps["type"] {
                 "str" | "string" => VarValue::Str(value),
                 "int" => match eval(&value) {
