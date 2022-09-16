@@ -145,3 +145,18 @@ My full name is Jone doe
 ```
 
 </details>
+
+<details>
+<summary>Read stdin</summary>
+
+```bash
+name: string = input("What is your name? ")
+age: string = input("What is your age? ")
+addr: string = input("What is your address? ")
+
+echo "My name is $name"
+echo "My age is $age"
+echo "I live in $addr"
+```
+
+</details>
