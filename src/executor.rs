@@ -54,6 +54,7 @@ impl<'a> Executor<'a> {
             } else if let Expression::Var(Variable { name, value }) = expr {
                 // todo: the `input` function evaluation should go here
                 // todo: Handle the case of empty input function
+                // ! todo: write tests for the `input` function
                 if is_input_fn(&value.to_string()) {
                     let input = self.read_input(value)?.parse::<VarValue>().unwrap();
                     self.vars.insert(&name, input);
