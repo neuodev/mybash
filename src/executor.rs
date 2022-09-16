@@ -3,18 +3,24 @@ use crate::{
     conditions::Condition,
     echo::Echo,
     lang_parser::Expression,
-    regex::RE_VAR_EXPANSION,
+    regex::{RE_INPUT_FUNC, RE_VAR_EXPANSION},
     utils::is_input_fn,
     variables::{VarValue, Variable},
 };
 use regex::Regex;
-use std::{collections::HashMap, env};
+use std::{
+    collections::HashMap,
+    env,
+    io::{stdin, stdout, Write},
+};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum ExeError {
     #[error("Compare Expr Error: {0}")]
     CompareExprErr(#[from] CompareExprErr),
+    #[error("Invalid `input` function: {0}")]
+    InvalidInputFunc(String),
 }
 
 pub struct Executor<'a> {
@@ -46,13 +52,11 @@ impl<'a> Executor<'a> {
             } else if let Expression::Condition(con) = expr {
                 self.eval_condition(con.as_ref())?;
             } else if let Expression::Var(Variable { name, value }) = expr {
-                // todo: the `read` function evaluation should go here
-                println!("{} = {}", name, value);
+                // todo: the `input` function evaluation should go here
+                // todo: Handle the case of empty input function
                 if is_input_fn(&value.to_string()) {
-                    self.vars.insert(
-                        &name,
-                        "This was an input function".parse::<VarValue>().unwrap(),
-                    );
+                    let input = self.read_input(value)?.parse::<VarValue>().unwrap();
+                    self.vars.insert(&name, input);
                 } else {
                     let result = self.eval_var_expansion(&value.to_string());
                     self.vars.insert(&name, result);
@@ -66,6 +70,20 @@ impl<'a> Executor<'a> {
     fn eval_echo(&self, s: &str) {
         let res = self.eval_var_expansion(s);
         println!("{}", res);
+    }
+
+    fn read_input(&self, value: &VarValue) -> Result<String, ExeError> {
+        let re = Regex::new(RE_INPUT_FUNC).unwrap();
+        if let Some(caps) = re.captures(&value.to_string()) {
+            let prefix = &caps["text"];
+            print!("{}", prefix);
+            stdout().flush().unwrap();
+            let mut buf = String::new();
+            stdin().read_line(&mut buf).unwrap();
+            Ok(buf.trim().to_string())
+        } else {
+            Err(ExeError::InvalidInputFunc(value.to_string()))
+        }
     }
 
     fn eval_var_expansion(&self, s: &str) -> VarValue {
