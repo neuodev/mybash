@@ -92,7 +92,6 @@ impl FromStr for Variable {
             let name = caps["name"].trim().to_string();
             let mut value = caps["value"].trim().to_string();
             if !is_input_fn(&value.trim()) {
-                println!("[{}] {} ", name, value);
                 let re = Regex::new(RE_QUOTE_REMOVAL).unwrap();
                 if let Some(caps) = re.captures(&value) {
                     value = caps["value"].to_string()
